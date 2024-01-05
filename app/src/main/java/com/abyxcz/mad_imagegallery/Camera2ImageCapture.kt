@@ -17,6 +17,7 @@ package com.abyxcz.mad_imagegallery
  */
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -30,6 +31,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
+import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
@@ -578,6 +580,18 @@ class Camera2ImageCapture : Fragment() {
                     Log.e(TAG, "Unable to write JPEG image to file", exc)
                     cont.resumeWithException(exc)
                 }
+
+
+                //BYTES TO GALLERY
+                try{
+                    context?.let {
+                        val sdf = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS", Locale.US)
+                        saveImageToGallery(it, bytes, sdf.toString())
+
+                    }
+                }catch (exc: IOException) {
+                    Log.e(TAG, "Unable to write JPEG image to GALLERY", exc)
+                }
             }
 
             // When the format is RAW we use the DngCreator utility library
@@ -598,6 +612,23 @@ class Camera2ImageCapture : Fragment() {
                 val exc = RuntimeException("Unknown image format: ${result.image.format}")
                 Log.e(TAG, exc.message, exc)
                 cont.resumeWithException(exc)
+            }
+        }
+    }
+
+    private fun saveImageToGallery(context: Context, bytes: ByteArray, displayName: String) {
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, displayName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            // Add more meta-data if necessary
+        }
+
+        val resolver = context.contentResolver
+        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+
+        uri?.let {
+            resolver.openOutputStream(it).use { outputStream ->
+                outputStream?.write(bytes)
             }
         }
     }
@@ -648,5 +679,6 @@ class Camera2ImageCapture : Fragment() {
             val sdf = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS", Locale.US)
             return File(context.filesDir, "IMG_${sdf.format(Date())}.$extension")
         }
+
     }
 }
