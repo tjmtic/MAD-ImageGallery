@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.abyxcz.mad_imagegallery"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.abyxcz.mad_imagegallery"
