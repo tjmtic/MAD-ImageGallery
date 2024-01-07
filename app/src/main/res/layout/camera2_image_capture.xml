@@ -41,7 +41,7 @@
         android:layout_height="96dp"
         android:layout_gravity="bottom|center"
         android:background="@drawable/ic_shutter"
-        android:contentDescription="@string/capture"
+        android:contentDescription="String Capture"
         android:scaleType="fitCenter" />
 
     <androidx.compose.ui.platform.ComposeView
