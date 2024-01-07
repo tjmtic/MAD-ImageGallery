@@ -7,6 +7,8 @@ android {
     namespace = "com.abyxcz.mad_imagegallery"
     compileSdk = 34
 
+    viewBinding.isEnabled = true
+
     defaultConfig {
         applicationId = "com.abyxcz.mad_imagegallery"
         minSdk = 31
@@ -49,6 +51,7 @@ android {
     }
 }
 
+
 dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
@@ -66,4 +69,14 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // EXIF Interface
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
+
+    // ViewPager2
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+
+    //Coil
+    implementation("io.coil-kt:coil:2.4.0")
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }
