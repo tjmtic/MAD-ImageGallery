@@ -12,6 +12,8 @@ import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Files
 import android.provider.MediaStore.Files.FileColumns
+import android.provider.MediaStore.Images
+import android.provider.MediaStore.Images.ImageColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.annotation.RequiresPermission
@@ -253,6 +255,8 @@ private suspend fun getVisualMedia(contentResolver: ContentResolver): List<FileE
             FileColumns.SIZE,
             FileColumns.MIME_TYPE,
             FileColumns.DATE_ADDED,
+            ImageColumns.LATITUDE,
+            ImageColumns.LONGITUDE
         )
 
         val collectionUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

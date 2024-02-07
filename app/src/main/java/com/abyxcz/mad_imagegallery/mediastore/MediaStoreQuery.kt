@@ -23,16 +23,23 @@ import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.Context
+import android.media.ExifInterface
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Images
 import android.text.format.Formatter
+import android.util.Log
 import androidx.annotation.RequiresPermission
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
@@ -40,7 +47,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -48,7 +58,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.abyxcz.mad_imagegallery.PermissionBox
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /*@Sample(
@@ -79,7 +91,7 @@ fun MediaStoreQueryContent() {
     val context = LocalContext.current
     val files by loadImages(context.contentResolver)
 
-    LazyColumn(Modifier.fillMaxSize()) {
+    LazyColumn(Modifier.fillMaxHeight().size(64.dp)) {
         item {
             ListItem(
                 headlineText = {
@@ -91,8 +103,10 @@ fun MediaStoreQueryContent() {
             Divider()
         }
         items(files) { file ->
+
             ListItem(
                 leadingContent = {
+
                     AsyncImage(
                         model = file.uri,
                         contentDescription = null,
@@ -108,10 +122,12 @@ fun MediaStoreQueryContent() {
                 supportingText = { Text(file.mimeType) },
                 trailingContent = { Text(Formatter.formatShortFileSize(context, file.size)) },
             )
+
             Divider()
         }
     }
 }
+
 
 @Composable
 private fun loadImages(
@@ -127,6 +143,7 @@ private fun loadImages(
 private suspend fun getImages(contentResolver: ContentResolver): List<FileEntry> {
     return withContext(Dispatchers.IO) {
         // List of columns we want to fetch
+        Log.d("Image Metadata Start:", "")
         val projection = arrayOf(
             Images.Media._ID,
             Images.Media.DISPLAY_NAME,
@@ -163,6 +180,33 @@ private suspend fun getImages(contentResolver: ContentResolver): List<FileEntry>
                 val size = cursor.getLong(sizeColumn)
                 val mimeType = cursor.getString(mimeTypeColumn)
                 val dateAdded = cursor.getLong(dateAddedColumn)
+
+                val imageUri = uri
+
+                // Access the ExifInterface to read image metadata
+                try {
+                    val inputStream = contentResolver.openInputStream(imageUri)
+                    if (inputStream != null) {
+                        val exifInterface = ExifInterface(inputStream)
+
+                        // Retrieve specific metadata values
+                        val latitude = exifInterface.getAttribute(ExifInterface.TAG_GPS_LATITUDE)
+                        val longitude = exifInterface.getAttribute(ExifInterface.TAG_GPS_LONGITUDE)
+
+                        val f = FloatArray(2)
+                        val l = 0L
+                        val tags = exifInterface.getLatLong(f)
+                        val time = exifInterface.dateTime
+
+                        // Handle latitude and longitude values to get the geo location
+                        Log.d("Image Metadata", "Latitude: $latitude, Longitude: $longitude, time: $time, tags: $tags, f:${f[0]}, f:${f[1]} ")
+
+                        // You can retrieve other metadata using different ExifInterface constants
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
 
                 images.add(FileEntry(uri, name, size, mimeType, dateAdded))
             }

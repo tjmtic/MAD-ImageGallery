@@ -21,6 +21,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import com.abyxcz.mad_imagegallery.databinding.Camera2ImageCaptureBinding
 import com.abyxcz.mad_imagegallery.databinding.MyFragmentLayoutBinding
+import com.abyxcz.mad_imagegallery.mediastore.MediaStoreQueryScreen
+import com.abyxcz.mad_imagegallery.mediastore.PhotoPicker
+import com.abyxcz.mad_imagegallery.mediastore.SelectedPhotosAccessScreen
 import com.abyxcz.mad_imagegallery.ui.theme.MADImageGalleryTheme
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +37,10 @@ class MainActivity : AppCompatActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Greeting("Android")
-                    FragmentContainerView()
+                    //SelectedPhotosAccessScreen()
+                    MediaStoreQueryScreen()
+                    PhotoPicker()
+                   // FragmentContainerView()
                 }
             }
         }
